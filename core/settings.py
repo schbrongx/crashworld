@@ -26,7 +26,14 @@ class PhysicsConfig:
     substeps: int = 5
     dt_substep: float = 1.0 / 240.0
 
+@dataclass(frozen=True)
+class QualityConfig:
+    shadows: bool = True
+    shadow_map_size: int = 512  # default 1024, lower if on WSL/X11 or iGPU
 
+
+QUALITY = QualityConfig
+#QUALITY = QualityConfig(shadows=False)  # for slow systems: disable shadows
 WINDOW = WindowConfig()
 CAMERA = CameraConfig()
 PHYSICS = PhysicsConfig()

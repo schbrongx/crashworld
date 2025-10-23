@@ -14,6 +14,13 @@ from core.controls import ControlSystem
 from ui.compass import CompassOverlay
 from objects.primitives import GroundPlane, BoxActor
 
+from core.lights import LightingRig
+
+# deaxtivate sound
+from panda3d.core import loadPrcFileData
+loadPrcFileData("", "audio-library-name null")
+
+
 
 class CrashWorldApp(ShowBase):
     """
@@ -22,6 +29,10 @@ class CrashWorldApp(ShowBase):
 
     def __init__(self) -> None:
         super().__init__()
+        
+        dr0 = self.win.getDisplayRegion(0)
+        dr0.setClearColorActive(True)
+        dr0.setClearColor(WINDOW.clear_color)
 
         # Window
         self.win.setClearColor(WINDOW.clear_color)
@@ -55,6 +66,9 @@ class CrashWorldApp(ShowBase):
 
         # UI
         self.compass = CompassOverlay(base=self)
+        
+        # Lighting
+        LightingRig(self.render)
 
         # Input bindings
         self.accept("alt-0", self.camera_rig.reset_pose)

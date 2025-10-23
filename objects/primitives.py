@@ -16,6 +16,8 @@ from panda3d.core import (
     GeomNode,
     CardMaker,
     LineSegs,
+    Material,
+    LightAttrib,
 )
 from panda3d.bullet import BulletBoxShape, BulletRigidBodyNode
 
@@ -71,6 +73,13 @@ class BoxActor:
         vis = parent.attachNewNode(node)
         vis.setColor(*self.color)
 
+        # simple material for specular highlights
+        mat = Material()
+        mat.setDiffuse((self.color[0], self.color[1], self.color[2], 1.0))
+        mat.setSpecular((0.2, 0.2, 0.2, 1.0))
+        mat.setShininess(16.0)
+        vis.setMaterial(mat, 1)
+
 
 class GroundPlane:
     """
@@ -85,8 +94,7 @@ class GroundPlane:
         floor.setP(-90)
         floor.setZ(0)
         floor.setColor(0.85, 0.85, 0.85, 1.0)
-        floor.setTwoSided(True)
-        floor.setBin("background", 0)
+        floor.setLightOff()
 
         grid_np = make_grid(size=size, step=step, z=0.01, color=(0.75, 0.75, 0.75, 1.0))
         grid_np.reparentTo(parent)

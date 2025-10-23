@@ -26,7 +26,7 @@ class CompassOverlay:
     base: ShowBase
     region_bounds: Tuple[float, float, float, float] = (0.0, 0.18, 0.82, 1.0)
     axis_length: float = 0.9
-    axis_thickness: float = 2.0
+    axis_thickness: float = 1.0  # 1.0 for reduced thicknes on slow systems, 2.0 for better viz
     bg_alpha: float = 0.35
 
     def __post_init__(self) -> None:
@@ -59,6 +59,9 @@ class CompassOverlay:
         dr.setSort(200)
         dr.setClearDepthActive(True)
         dr.setClearColorActive(False)
+        
+        self._scene.setDepthTest(False)
+        self._scene.setDepthWrite(False)
 
         lens = PerspectiveLens()
         lens.setFov(30)
@@ -77,6 +80,7 @@ class CompassOverlay:
         cm = CardMaker("compass_bg")
         cm.setFrame(-1.0, 1.0, -1.0, 1.0)
         bg = self._cam_np.attachNewNode(cm.generate())
+        bg.setAttrib(TransparencyAttrib.make(TransparencyAttrib.M_alpha))
         bg.setPos(0, 0.02, 0)
         bg.setScale(1.05)
         bg.setColor(0, 0, 0, self.bg_alpha)
