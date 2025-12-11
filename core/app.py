@@ -15,6 +15,7 @@ from ui.compass import CompassOverlay
 from objects.primitives import GroundPlane, BoxActor
 
 from core.lights import LightingRig
+from core.scene_config import load_scene_config, SceneConfigError
 
 # deaxtivate sound
 from panda3d.core import loadPrcFileData
@@ -27,7 +28,7 @@ class CrashWorldApp(ShowBase):
     Main app that wires world, camera, UI, and controls.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, config_path: str | None = None) -> None:
         super().__init__()
         
         dr0 = self.win.getDisplayRegion(0)
@@ -44,10 +45,13 @@ class CrashWorldApp(ShowBase):
         # Visual base plane and grid
         GroundPlane.attach_visual_floor(self.render, size=200.0, step=5.0)
 
-        # Example dynamic cube
-        box = BoxActor(size=1.0, mass=1.0)
-        box_np = self.world.attach_actor(box)
-        box_np.setPos(0, 0, 8)
+        # Spawn cubes from config (or fall back to a single demo cube)
+        if config_path:
+            self._spawn_from_config(config_path)
+        else:
+            box = BoxActor(size=1.0, mass=1.0)
+            box_np = self.world.attach_actor(box)
+            box_np.setPos(0, 0, 8)
 
         # Camera rig + controls
         self.disableMouse()
@@ -77,6 +81,21 @@ class CrashWorldApp(ShowBase):
 
         # Tasks
         self.taskMgr.add(self._update, "app_update")
+
+    def _spawn_from_config(self, config_path: str) -> None:
+     try:
+         specs = load_scene_config(config_path)
+     except SceneConfigError as e:
+         raise RuntimeError(f"Scene config error: {e}") from e
+
+     # "Spawn at once": create all actors in one pass before the main loop runs.
+     for spec in specs:
+         actor = BoxActor(size=spec.size, mass=spec.mass, color=spec.color)
+         np = self.world.attach_actor(actor)
+         np.setName(spec.name)
+         np.setPos(*spec.pos)
+
+
 
     # --- main loop ---
     def _update(self, task: Task) -> Task:
