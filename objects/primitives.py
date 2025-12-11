@@ -32,7 +32,7 @@ class BoxActor:
     size: float = 1.0
     mass: float = 1.0
     color: tuple[float, float, float, float] = (0.9, 0.3, 0.2, 1.0)
-
+    
     def make_node(self) -> BulletRigidBodyNode:
         s = self.size * 0.5
         shape = BulletBoxShape(LVector3(s, s, s))
